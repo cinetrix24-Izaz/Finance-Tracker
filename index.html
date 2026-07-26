@@ -287,6 +287,7 @@
     max-height:88vh; overflow-y:auto;
   }
   .modal-overlay.open .modal{transform:translateY(0);}
+  .modal.hidden{display:none;}
   .modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
   .modal-head h3{margin:0; font-size:19px; font-weight:800;}
   .modal-close{background:#F3F4F6; border:none; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-secondary);}
@@ -505,7 +506,7 @@
   <div class="modal-overlay" id="modal-overlay">
 
     <!-- Add Income -->
-    <div class="modal" id="modal-income">
+    <div class="modal hidden" id="modal-income">
       <div class="modal-head">
         <h3>Add New Income</h3>
         <button class="modal-close" onclick="closeModal()">
@@ -540,7 +541,7 @@
     </div>
 
     <!-- Add Debt -->
-    <div class="modal" id="modal-debt">
+    <div class="modal hidden" id="modal-debt">
       <div class="modal-head">
         <h3>Add New Debt</h3>
         <button class="modal-close" onclick="closeModal()">
@@ -579,7 +580,7 @@
     </div>
 
     <!-- Add Expense -->
-    <div class="modal" id="modal-expense">
+    <div class="modal hidden" id="modal-expense">
       <div class="modal-head">
         <h3>Add New Expense</h3>
         <button class="modal-close" onclick="closeModal()">

@@ -731,21 +731,39 @@ function escapeHtml(str) {
 // 4) DERIVED DASHBOARD STATS (computed client-side from income + debts)
 // -------------------------------------------------------------------------
 function computeStats() {
-  const totalExpectedInflow = state.income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+  // 1. Calculate Money Out (Expenses & Paid Debts)
+  const totalExpenses = state.expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+  const paidDebts = state.debts.reduce((sum, d) => sum + (Number(d.paid) || 0), 0);
 
+  // 2. Calculate Money In (Income)
+  // Total Expected Inflow = Sum of ALL logged income
+  const totalExpectedInflow = state.income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+  
+  // Received Income = ONLY income specifically marked as 'Received'
+  const receivedIncome = state.income
+    .filter(i => (i.status || '').toLowerCase() === 'received')
+    .reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+
+  // 3. Dynamic Cash in Hand (Starting Base + Money In - Money Out)
+  // I set the base to 618 based on your original sheet. Change it to 0 if you prefer!
+  const BASE_CASH = 618; 
+  state.cashInHand = BASE_CASH + receivedIncome - totalExpenses - paidDebts;
+
+  // 4. Calculate Debts Owed
   const bkashRow = state.debts.find(d => /bkash/i.test(d.person));
   const bKashDue = bkashRow ? (Number(bkashRow.due) || 0) : 0;
-
+  
   const immediateDebts = state.debts
     .filter(d => d !== bkashRow)
     .reduce((sum, d) => sum + (Number(d.due) || 0), 0);
-
+  
   const totalLiability = immediateDebts + bKashDue;
-  const netBalance = totalExpectedInflow - immediateDebts;
 
-  // Overall "Net Status" shown top-right. Adjust this formula freely to
-  // match your own accounting logic — it currently combines cash on hand,
-  // expected inflow, and total liability into a single at-a-glance figure.
+  // 5. Calculate Disposable & Net Status
+  // Disposable = Your actual cash + what you expect to get - immediate debts
+  const netBalance = state.cashInHand + totalExpectedInflow - immediateDebts;
+  
+  // Overall Net Status = Everything you have/expect - EVERYTHING you owe
   const netStatus = state.cashInHand + totalExpectedInflow - totalLiability;
 
   return { totalExpectedInflow, immediateDebts, bKashDue, totalLiability, netBalance, netStatus, bkashRow };
